@@ -11,13 +11,9 @@
 * [Documentation](#documentation)
   * [Data Processing](#1-data-processing)
   * [Document Embeddings](#2-create-document-embeddings)
+  * [Knowledge Graph](#3-create-knowledge-graph)
   * [Graph Neural Network](#4-graph-neural-network)
-  * 
 * [File Descriptions](#file-descriptions)
-* [Setup](#setup)
-* [How to Use](#how-to-use)
-* [Improvements](#improvements)
-* [Data Flow](#data-flow)
 
 ## Introduction
 With the large source of data collected from news and reports, as well as from our own database of companies, these data can be put together to **_predict the interest and urgency scores_** for investing in portfolio companies. 
@@ -94,5 +90,53 @@ Legend:
 
 Finally, we will add in [attributes](https://networkx.org/documentation/stable/reference/generated/networkx.classes.function.set_node_attributes.html) into our empty nodes. All of our **_text data will be transformed into a 1D tensor_** and set as a **_'feature' attribute_**, to be used for training of the GNN. The allocation of the companies **_(active, watchlight, not interested)_** will be set as an **_'allocation' attribute_**, to be used as labels for the GNN output.
 <br/> 
+<br/> 
 
 ### 4) Graph Neural Network
+As mentioned earlier, we will be using StellarGraph for GNN training and prediction. This is because it supports loading data in the format of a **_NetworkX object_**, and it also contains many of the **_state-of-the-art graph neural models_**.
+
+In our graph, our tensors will be used as features for training, while the allocations will be what we are trying to predict. This helps us determine which companies we should be looking more to invest in.
+
+Now, we will load in the graph and **_set the 'features' attribute (text data) as node features_**.
+
+```
+stellar = StellarGraph.from_networkx(G, node_features='feature')
+```
+<br/> 
+
+I intentionally made the nodes of all type 'default' as many common neural networks like GCN, GAT only support **_single-node-type_**. I also created indices for the graph model to use as a reference for **_splitting into training, validation and test datasets_**. 
+
+For company nodes, we will label them according to 'active', 'watchlight' or not 'interested'. For venture, industry and technology nodes, we will label them as 'default'.
+
+We will be using the **_LabelBinarizer_** to encode the node names into unique numbers so that they can be input into the graph.
+<br/> 
+<br/> 
+
+First model we will be trying out is the [Graph Convolutional Network](https://towardsdatascience.com/understanding-graph-convolutional-networks-for-node-classification-a2bfdb7aba7b). The GCN class packages the **_stack of convolutional layers and dropout layers_**, with layer size = (number of hidden GCN layers, size of each layer). The **_generator converts graph data into Keras format_**.
+```
+generator = FullBatchNodeGenerator(stellar, method="gcn")
+gcn = GCN(layer_sizes=[16, 16], activations=["relu", "relu"], generator=generator, dropout=0.2)
+```
+*Results obtained:*
+
+![image](https://user-images.githubusercontent.com/77097236/126605823-bff5a976-908b-4c35-9754-a61a9907f69b.png)
+<br/> 
+<br/> 
+
+Next model we will be trying out is the [Graph Attention Network](https://paperswithcode.com/method/gat), an improved GNN which utilizes the **_'Attention' mechanism_**, similar to the BERT-series.
+```
+generator = FullBatchNodeGenerator(stellar, method="gat")
+gat = GAT(
+    layer_sizes=[8, train_targets.shape[1]],
+    activations=["elu", "softmax"],
+    attn_heads=8,
+    generator=generator,
+    in_dropout=0.5,
+    attn_dropout=0.5,
+    normalize=None,
+)
+```
+
+*Results obtained:*
+
+![image](https://user-images.githubusercontent.com/77097236/126606891-7f91c0c5-13ad-44ff-9e59-0b339b64383e.png)
