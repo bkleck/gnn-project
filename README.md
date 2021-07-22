@@ -13,7 +13,7 @@
   * [Document Embeddings](#2-create-document-embeddings)
   * [Knowledge Graph](#3-create-knowledge-graph)
   * [Graph Neural Network](#4-graph-neural-network)
-* [File Descriptions](#file-descriptions)
+* [Possible Improvements](#possible-improvements)
 
 ## Introduction
 With the large source of data collected from news and reports, as well as from our own database of companies, these data can be put together to **_predict the interest and urgency scores_** for investing in portfolio companies. 
@@ -140,3 +140,10 @@ gat = GAT(
 *Results obtained:*
 
 ![image](https://user-images.githubusercontent.com/77097236/126606891-7f91c0c5-13ad-44ff-9e59-0b339b64383e.png)
+<br/> 
+<br/> 
+
+## Possible Improvements
+1) Add in freshly encoded interesy/urgency scores to create more training data with both January and May datasets.
+2) Make use of GNNs that support multi node-types to ignore nodes like ventures, industries and technologies during training.
+3) Add in summaries over time to provide more features for training.
