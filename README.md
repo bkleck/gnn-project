@@ -8,8 +8,11 @@
 ## Table of Contents
 * [Introduction](#introduction)
 * [Technology](#technology)
-* [Workflow](#workflow)
-  * [Cleaning Scraped News](#1-cleaning-scraped-news)
+* [Documentation](#documentation)
+  * [Data Processing](#1-data-processing)
+  * [Document Embeddings](#2-create-document-embeddings)
+  * [Graph Neural Network](#4-graph-neural-network)
+  * 
 * [File Descriptions](#file-descriptions)
 * [Setup](#setup)
 * [How to Use](#how-to-use)
@@ -88,3 +91,8 @@ Legend:
 - **Purple = Industries**
 - **Pink = Tech**
 - **Turquoise = Companies**
+
+Finally, we will add in [attributes](https://networkx.org/documentation/stable/reference/generated/networkx.classes.function.set_node_attributes.html) into our empty nodes. All of our **_text data will be transformed into a 1D tensor_** and set as a **_'feature' attribute_**, to be used for training of the GNN. The allocation of the companies **_(active, watchlight, not interested)_** will be set as an **_'allocation' attribute_**, to be used as labels for the GNN output.
+<br/> 
+
+### 4) Graph Neural Network
